@@ -3,15 +3,7 @@ import P5Wrapper from 'react-p5-wrapper';
 
 import DisplayState from '../components/DisplayState';
 
-
 class HomePage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      connected: 0
-    };
-  }
-
   render() {
     return (
       <div>

@@ -17,7 +17,12 @@ io.on('connection', (client) => {
     state.clients[client.id].claps += 1;
     /* Remove after half a second */
     setTimeout(() => {
-      state.clients[client.id].claps -= 1;
+      try {
+        state.clients[client.id].claps -= 1;
+      } catch (err) {
+        /* Connection probably ended and this call back was just left. */
+        console.log(err);
+      }
     }, 500);
   });
 
