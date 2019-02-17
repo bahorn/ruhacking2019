@@ -13,6 +13,9 @@ class AudioController extends Component {
     super(props);
 
     this.state = {
+      threshold: 0.015,
+      clapping: '',
+      last: Date.now(),
       stream: null,
       spectrum: {
         datasets: [
@@ -64,7 +67,14 @@ class AudioController extends Component {
 
   /* Callback used for processing audio. Gets passed AudioBuffer */
   processAudio(e) {
+    let clapping = this.state.clapping;
+    let last = this.state.last;
     const buffer = e.inputBuffer;
+    /* Clear the last detected clap emoji if over a second ago */
+    if (Date.now() > last+3000) {
+      clapping = '';
+    }
+
     /* Get the meta data */
     const { length, duration, sampleRate, numberOfChannels } = buffer;
     const channels = []
@@ -77,11 +87,15 @@ class AudioController extends Component {
     const fft = new DSP.FFT(length, sampleRate);
     fft.forward(channels[0]);
     const sum = fft.spectrum.reduce((a, b) => { return a + b});
-    if ((sum/fft.spectrum.length) > 0.03) {
+    if ((sum/fft.spectrum.length) > this.state.threshold) {
       console.log('SENT');
       Vote('wow');
+      clapping = '👏';
+      last = Date.now();
     }
     this.setState({
+      clapping,
+      last,
       spectrum: {
         datasets: [
           {
@@ -102,7 +116,7 @@ class AudioController extends Component {
     return (
       <div>
         {active}
-        <h2>Audio Spectrum</h2>
+        <h2>Audio Spectrum {this.state.clapping}</h2>
         <Line
           data={this.state.spectrum}
           options={this.state.options}
