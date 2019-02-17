@@ -3,6 +3,8 @@ import { Line } from 'react-chartjs-2';
 
 import DSP from '../deps/dsp.js/dsp';
 
+import { Vote } from '../net/socketio';
+
 
 /* Uses the Web Audio API, with docs available here:
  * https://developers.google.com/web/fundamentals/media/recording-audio/ */
@@ -24,9 +26,9 @@ class AudioController extends Component {
           yAxes: [{
             ticks: {
               suggestedMin: 0,
-              suggestedMax: 0.005,
+              suggestedMax: 0.5,
               min: 0,
-              max: 0.05,
+              max: 0.5,
             }
           }]
         }
@@ -35,6 +37,7 @@ class AudioController extends Component {
 
     this.audioEnabled = this.audioEnabled.bind(this);
     this.processAudio = this.processAudio.bind(this);
+    /* Setup websocket connection */
 
     /* Ask for an audio stream */
     navigator
@@ -51,7 +54,7 @@ class AudioController extends Component {
     /* Setup our handler */
     const context = new AudioContext();
     const source = context.createMediaStreamSource(stream);
-    const processor = context.createScriptProcessor(512, 1, 1);
+    const processor = context.createScriptProcessor(256, 1, 1);
 
     source.connect(processor);
     processor.connect(context.destination);
@@ -74,7 +77,10 @@ class AudioController extends Component {
     const fft = new DSP.FFT(length, sampleRate);
     fft.forward(channels[0]);
     const sum = fft.spectrum.reduce((a, b) => { return a + b});
-    console.log(((sum/fft.spectrum.length)>0.02));
+    if ((sum/fft.spectrum.length) > 0.03) {
+      console.log('SENT');
+      Vote('wow');
+    }
     this.setState({
       spectrum: {
         datasets: [
@@ -96,10 +102,10 @@ class AudioController extends Component {
     return (
       <div>
         {active}
+        <h2>Audio Spectrum</h2>
         <Line
           data={this.state.spectrum}
           options={this.state.options}
-          height={75}
         />
           </div>
     )
