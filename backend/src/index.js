@@ -23,7 +23,7 @@ io.on('connection', (client) => {
         /* Connection probably ended and this call back was just left. */
         console.log(err);
       }
-    }, 500);
+    }, 300);
   });
 
   /* Remove ourselves. */
@@ -36,7 +36,7 @@ io.on('connection', (client) => {
 /* Trigger an emit of the current value */
 const updateEmitter = () => {
   io.emit('update', state);
-  setTimeout(updateEmitter, 250);
+  setTimeout(updateEmitter, 50);
 };
 
 const port = 8000;

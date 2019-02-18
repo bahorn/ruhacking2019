@@ -13,7 +13,7 @@ class AudioController extends Component {
     super(props);
 
     this.state = {
-      threshold: 0.015,
+      threshold: 0.010,
       clapping: '',
       last: Date.now(),
       stream: null,
@@ -71,7 +71,7 @@ class AudioController extends Component {
     let last = this.state.last;
     const buffer = e.inputBuffer;
     /* Clear the last detected clap emoji if over a second ago */
-    if (Date.now() > last+3000) {
+    if (Date.now() > last+1500) {
       clapping = '';
     }
 
